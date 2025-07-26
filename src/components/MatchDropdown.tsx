@@ -1,10 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { GameService } from '../services/gameService';
 import { Match } from '../models';
 
 const MatchDropdown: React.FC = () => {
+  const router = useRouter();
   const [matches, setMatches] = useState<Match[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -27,6 +29,7 @@ const MatchDropdown: React.FC = () => {
   const handleMatchSelect = (match: Match) => {
     console.log('Selected match:', match);
     setIsOpen(false);
+    router.push(`/matches/${match.match_id}`);
   };
 
   const toggleDropdown = () => {

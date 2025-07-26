@@ -4,7 +4,9 @@ import {
   Player,
   Match,
   Partnership,
-  RegionParams
+  RegionParams,
+  GameInfo,
+  PlayerInfo
 } from '../models';
 
 // Base API configuration
@@ -53,13 +55,13 @@ const fetchLocalFile = async <T>(filePath: string): Promise<T> => {
 // Game Service class
 export class GameService {
   // Get specific game/match information by ID
-  static async getGameInfo(id: string): Promise<Ball[]> {
-    return fetchWithErrorHandling<Ball[]>(`${API_BASE_URL}/matches/${id}`);
+  static async getGameInfo(id: string): Promise<GameInfo> {
+    return fetchWithErrorHandling<GameInfo>(`${API_BASE_URL}/matches/${id}`);
   }
 
   // Get all players
-  static async getPlayers(): Promise<Player[]> {
-    return fetchWithErrorHandling<Player[]>(`${API_BASE_URL}/players`);
+  static async getPlayers(): Promise<PlayerInfo> {
+    return fetchWithErrorHandling<PlayerInfo>(`${API_BASE_URL}/players`);
   }
 
   // Get player images from local data

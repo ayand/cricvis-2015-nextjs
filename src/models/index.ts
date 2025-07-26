@@ -78,11 +78,14 @@ export interface Match {
 }
 
 export interface Partnership {
-  batsman1: string;
-  batsman2: string;
-  runs: number;
-  balls: number;
-  [key: string]: any;
+  batsman_1: string;
+  batsman_2: string;
+  batsman_1_score: number;
+  batsman_2_score: number;
+  score: number;
+  team: string;
+  game: number;
+  position: number;
 }
 
 export interface RegionParams {
@@ -93,3 +96,47 @@ export interface RegionParams {
   xName: string;
   yName: string;
 } 
+
+export interface GameInfo {
+  balls: BallData[];
+  first_batsmen: string[];
+  second_batsmen: string[];
+}
+
+
+export interface BattingInning {
+  balls_faced: number;
+  "6s_scored": number;
+  runs_scored: number;
+  "4s_scored": number;
+}
+
+export interface BowlingInning {
+  "6s_conceded": number;
+  no_balls_bowled: number;
+  "4s_conceded": number;
+  wickets_taken: number;
+  dot_balls_bowled: number;
+  runs_conceded: number;
+  wides_bowled: number;
+  extras_conceded: number;
+  balls_bowled: number;
+}
+
+export interface PlayerInningStats {
+  batting_inning: BattingInning;
+  bowling_inning: BowlingInning;
+}
+
+export interface IndividualPlayerInfo {
+  hand: string;
+  name: string;
+  team: string;
+  games: {
+    [key: string]: PlayerInningStats;
+  };
+}
+
+export interface PlayerInfo {
+  [key: string]: IndividualPlayerInfo;
+}
