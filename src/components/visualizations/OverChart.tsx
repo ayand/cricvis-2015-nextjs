@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import { BallData } from '@/models';
+import { isWicketBall, decideColor } from '@/services/ballService';
 
 interface OverChartProps {
   val: BallData[];
@@ -51,47 +52,6 @@ const OverChart: React.FC<OverChartProps> = ({
     const overs = d3.scaleBand()
       .range([margin, (width - margin)])
       .domain(overNumbers);
-
-    const teamColors: Record<string, string> = {
-      "India": "#0080FF",
-      "Bangladesh": "#5AAB54",
-      "United Arab Emirates": "#003366",
-      "Scotland": "#66B2FF",
-      "Ireland": "#80FF00",
-      "Afghanistan": "#0066CC",
-      "England": "#004C99",
-      "South Africa": "#006633",
-      "Australia": "gold",
-      "New Zealand": "#000000",
-      "West Indies": "#660000",
-      "Pakistan": "#00CC00",
-      "Zimbabwe": "#CC0000",
-      "Sri Lanka": "#000099"
-    };
-
-    const isWicketBall = (d: BallData) => {
-      return d.wicket === true && d.extras_type !== "Nb" && d.extras_type !== "Wd";
-    };
-
-    const decideColor = (d: BallData) => {
-      if (isWicketBall(d)) {
-        return "#F45333";
-      } else {
-        if (d.runs_batter === 0 && d.extras_type !== "Wd" && d.extras_type !== "Nb") {
-          return "#CCCCCC";
-        } else {
-          if (d.extras_type !== "") {
-            return "#7BCCC4";
-          } else {
-            if (d.runs_batter < 4) {
-              return "#43A2CA";
-            } else {
-              return "#0868AC";
-            }
-          }
-        }
-      }
-    };
 
     const barHeight = (d: BallData) => {
       if (d.runs_batter <= 1) {

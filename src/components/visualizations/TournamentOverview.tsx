@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import { BallData, MatchBallGroup, MatchesByTeam, Player } from '../../models';
+import { decideColor } from '@/services/ballService';
 
 interface TournamentOverviewProps {
   data: MatchesByTeam;
@@ -24,7 +25,6 @@ export default function TournamentOverview({
 
   const yDimension = 830;
   const xDimension = 1075;
-  const height = 280;
 
   // Static visualization setup - runs only once
   useEffect(() => {
@@ -32,30 +32,6 @@ export default function TournamentOverview({
 
     // Clear previous content
     d3.select(svgRef.current).selectAll("*").remove();
-
-    const isWicketBall = (d: any) => {
-      return d.wicket === true && d.extras_type !== "Nb" && d.extras_type !== "Wd";
-    };
-
-    const decideColor = (d: any) => {
-      if (isWicketBall(d)) {
-        return "#F45333";
-      } else {
-        if (d.runs_batter === 0 && d.extras_type !== "Wd" && d.extras_type !== "Nb") {
-          return "#CCCCCC";
-        } else {
-          if (d.extras_type !== "") {
-            return "#7BCCC4";
-          } else {
-            if (d.runs_batter < 4) {
-              return "#43A2CA";
-            } else {
-              return "#0868AC";
-            }
-          }
-        }
-      }
-    };
 
     const teamColors: Record<string, string> = {
       "India": "#0080FF",
