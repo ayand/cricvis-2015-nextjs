@@ -54,11 +54,11 @@ const MatchPageClient: React.FC<MatchPageClientProps> = ({
       </div>
 
         {/* Inning Selection Display */}
-        <div className="text-center mb-6">
+        {/* <div className="text-center mb-6">
           <p className="text-lg font-medium text-gray-700">
             Currently viewing: Inning {selectedInning}
           </p>
-        </div>
+        </div> */}
         
         {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div className="bg-gray-50 rounded-lg p-4">

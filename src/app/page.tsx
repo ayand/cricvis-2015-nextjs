@@ -1,6 +1,3 @@
-import Image from "next/image";
-import ExampleUsage from "@/components/ExampleUsage";
-
 export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-8">
