@@ -19,8 +19,6 @@ const VerticalColorLegend: React.FC<VerticalColorLegendProps> = ({ className = '
     // Clear any existing content
     d3.select(svgRef.current).selectAll('*').remove();
 
-    
-
     const svg = d3.select(svgRef.current)
       .attr('width', width)
       .attr('height', height);

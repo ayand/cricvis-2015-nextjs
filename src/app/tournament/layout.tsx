@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import LoadingSpinner from '../../components/LoadingSpinner';
+import LoadingSpinner from '../../components/utilities/LoadingSpinner';
 
 interface Team {
   team: string;

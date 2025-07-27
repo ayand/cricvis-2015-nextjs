@@ -9,6 +9,7 @@ interface GameContextType {
   flags: Record<string, string>;
   partnerships: Partnership[];
   images: Record<string, string>;
+  seeAllBalls: boolean;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -20,6 +21,7 @@ interface GameProviderProps {
   flags: Record<string, string>;
   partnerships: Partnership[];
   images: Record<string, string>;
+  seeAllBalls: boolean;
 }
 
 export const GameProvider: React.FC<GameProviderProps> = ({
@@ -28,14 +30,16 @@ export const GameProvider: React.FC<GameProviderProps> = ({
   players,
   flags,
   partnerships,
-  images
+  images,
+  seeAllBalls
 }) => {
   const value: GameContextType = {
     gameInfo,
     players,
     flags,
     partnerships,
-    images
+    images,
+    seeAllBalls
   };
 
   return (

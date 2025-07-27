@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import TournamentOverview from './TournamentOverview';
-import VerticalColorLegend from './VerticalColorLegend';
-import PlayerGrid from './PlayerGrid';
-import { Player } from '../models';
+import TournamentOverview from '../visualizations/TournamentOverview';
+import VerticalColorLegend from '../visualizations/VerticalColorLegend';
+import PlayerGrid from '../utilities/PlayerGrid';
+import { Player } from '../../models';
 
 interface TeamPageClientProps {
   matches: any;

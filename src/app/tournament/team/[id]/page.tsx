@@ -1,7 +1,7 @@
 import { GameService } from '../../../../services/gameService';
-import TournamentOverview from '../../../../components/TournamentOverview';
-import VerticalColorLegend from '../../../../components/VerticalColorLegend';
-import TeamPageClient from '../../../../components/TeamPageClient';
+import TournamentOverview from '../../../../components/visualizations/TournamentOverview';
+import VerticalColorLegend from '../../../../components/visualizations/VerticalColorLegend';
+import TeamPageClient from '../../../../components/clients/TeamPageClient';
 
 interface TeamPageProps {
   params: {

@@ -10,6 +10,8 @@ interface MatchHeaderProps {
   ground: string;
   result: string;
   onInningChange: (inning: number) => void;
+  seeAllBalls: boolean;
+  onSeeAllBallsChange: () => void;
 }
 
 const MatchHeader: React.FC<MatchHeaderProps> = ({
@@ -18,7 +20,9 @@ const MatchHeader: React.FC<MatchHeaderProps> = ({
   date,
   ground,
   result,
-  onInningChange
+  onInningChange,
+  seeAllBalls,
+  onSeeAllBallsChange
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedInning, setSelectedInning] = useState<number>(1);
@@ -47,14 +51,28 @@ const MatchHeader: React.FC<MatchHeaderProps> = ({
       <h3 className="text-xl font-semibold text-gray-700 mb-4">Skyline of Overs</h3>
       
       <div className="flex flex-col items-center space-y-4">
-        <div className="flex space-x-2">
-          <button className="btn btn-default">
-            Ball-by-Ball Analysis
-          </button>
-          <button className="btn btn-default">
-            Over Summary
-          </button>
-        </div>
+      <div className="flex gap-2">
+              <button
+                className={`px-4 py-2 rounded font-medium transition-colors ${
+                  seeAllBalls
+                    ? 'bg-green-500 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+                onClick={() => onSeeAllBallsChange()}
+              >
+                Ball-by-Ball Analysis
+              </button>
+              <button
+                className={`px-4 py-2 rounded font-medium transition-colors ${
+                  !seeAllBalls
+                    ? 'bg-green-500 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+                onClick={() => onSeeAllBallsChange()}
+              >
+                Over Summary
+              </button>
+            </div>
         
         <div className="dropdown">
           <div className="btn-group">

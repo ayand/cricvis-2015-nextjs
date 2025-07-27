@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
-import { BallData, MatchBallGroup, MatchesByTeam, Player } from '../models';
+import { BallData, MatchBallGroup, MatchesByTeam, Player } from '../../models';
 
 interface TournamentOverviewProps {
   data: MatchesByTeam;

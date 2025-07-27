@@ -1,12 +1,32 @@
 'use client';
 
-import { useGameContext } from '../contexts/GameContext';
-import OverChart from './OverChart';
-import VerticalColorLegend from './VerticalColorLegend';
+import { BallData, OverSummary } from '@/models';
+import { useGameContext } from '../../contexts/GameContext';
+import OverChart from '../visualizations/OverChart';
+import VerticalColorLegend from '../visualizations/VerticalColorLegend';
 import Image from 'next/image';
+import OverSummaryChart from '../visualizations/OverSummaryChart';
+import InningsChartsDisplay from '../utilities/InningsChartsDisplay';
+
+const calculateOverSummaries = (balls: BallData[]): OverSummary[] => {
+    const maxOvers = Math.floor(balls[balls.length - 1].ovr) + 1;
+    const overSummaries: OverSummary[] = Array(maxOvers).fill(null).map(() => ({
+        runs: 0,
+        wickets: 0
+    }));
+
+    balls.forEach(ball => {
+        const over = Math.floor(ball.ovr);
+        const wicketAmount = (ball.wicket && ball.extras_type != "Nb" && ball.extras_type != "Wd") ? 1 : 0;
+        overSummaries[over].runs += ball.runs_batter;
+        overSummaries[over].wickets += wicketAmount;
+    });
+
+    return overSummaries;
+};
 
 const GameDataDisplay: React.FC = () => {
-    const { gameInfo, players, flags, partnerships, images } = useGameContext();
+    const { gameInfo, flags, seeAllBalls } = useGameContext();
 
     // Calculate runs and wickets for each inning
     const calculateInningStats = (inning: number) => {
@@ -26,6 +46,12 @@ const GameDataDisplay: React.FC = () => {
     // Filter balls for each inning
     const firstInningBalls = gameInfo.balls.filter(ball => ball.inning === 1);
     const secondInningBalls = gameInfo.balls.filter(ball => ball.inning === 2);
+
+    const firstDivision = calculateOverSummaries(firstInningBalls);
+    const secondDivision = calculateOverSummaries(secondInningBalls);
+
+    const firstBattingTeam = firstInningBalls[0].batting_team;
+    const secondBattingTeam = secondInningBalls[0].batting_team;
 
     return (
         <div className="bg-white rounded-lg shadow-lg p-6">
@@ -68,15 +94,15 @@ const GameDataDisplay: React.FC = () => {
                                 {firstInningStats.totalRuns}-{firstInningStats.totalWickets}
                             </p>
                         </div>
-                        
-                        <div className="bg-white rounded p-4 border border-gray-200 flex justify-center">
-                            <OverChart
-                                val={firstInningBalls}
-                                min={1}
-                                max={50}
-                                hoverswitch={true}
-                            />
-                        </div>
+                        <InningsChartsDisplay
+                            ballData={firstInningBalls}
+                            min={1}
+                            max={50}
+                            hoverswitch={true}
+                            overSummaries={firstDivision.map((ball, i) => ({ 'key': i, ...ball }))}
+                            team={firstBattingTeam}
+                            seeAllBalls={seeAllBalls}
+                        />
                     </div>
 
                     {/* Second Innings */}
@@ -103,15 +129,15 @@ const GameDataDisplay: React.FC = () => {
                                 {secondInningStats.totalRuns}-{secondInningStats.totalWickets}
                             </p>
                         </div>
-                        
-                        <div className="bg-white rounded p-4 border border-gray-200 flex justify-center">
-                            <OverChart
-                                val={secondInningBalls}
-                                min={1}
-                                max={50}
-                                hoverswitch={true}
-                            />
-                        </div>
+                        <InningsChartsDisplay
+                            ballData={secondInningBalls}
+                            min={1}
+                            max={50}
+                            hoverswitch={true}
+                            overSummaries={secondDivision.map((ball, i) => ({ 'key': i, ...ball }))}
+                            team={secondBattingTeam}
+                            seeAllBalls={seeAllBalls}
+                        />
                     </div>
                 </div>
 
@@ -123,31 +149,8 @@ const GameDataDisplay: React.FC = () => {
                     </div>
                 </div>
             </div>
-
-            {/* Match Summary */}
-            {/* <div className="mt-6 bg-blue-50 rounded-lg p-4">
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">Match Summary</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                    <div>
-                        <span className="font-medium text-gray-700">Total Balls:</span>
-                        <span className="ml-2 text-gray-600">{gameInfo.balls.length}</span>
-                    </div>
-                    <div>
-                        <span className="font-medium text-gray-700">Total Players:</span>
-                        <span className="ml-2 text-gray-600">{Object.keys(players).length}</span>
-                    </div>
-                    <div>
-                        <span className="font-medium text-gray-700">Partnerships:</span>
-                        <span className="ml-2 text-gray-600">{partnerships.length}</span>
-                    </div>
-                    <div>
-                        <span className="font-medium text-gray-700">Player Images:</span>
-                        <span className="ml-2 text-gray-600">{Object.keys(images).length}</span>
-                    </div>
-                </div>
-            </div> */}
         </div>
     );
 };
 
-export default GameDataDisplay; 
+export default GameDataDisplay;

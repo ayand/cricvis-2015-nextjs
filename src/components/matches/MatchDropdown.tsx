@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { GameService } from '../services/gameService';
-import { Match } from '../models';
+import { GameService } from '../../services/gameService';
+import { Match } from '../../models';
 
 const MatchDropdown: React.FC = () => {
   const router = useRouter();

@@ -1,4 +1,4 @@
-import MatchDropdown from "@/components/MatchDropdown";
+import MatchDropdown from "@/components/matches/MatchDropdown";
 
 export default function MatchesLayout({ children }: { children: React.ReactNode }) {
   return (

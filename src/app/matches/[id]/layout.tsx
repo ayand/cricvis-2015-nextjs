@@ -1,5 +1,5 @@
 import { GameService } from '../../../services/gameService';
-import MatchPageClient from '../../../components/MatchPageClient';
+import MatchPageClient from '../../../components/clients/MatchPageClient';
 
 interface MatchLayoutProps {
   params: {

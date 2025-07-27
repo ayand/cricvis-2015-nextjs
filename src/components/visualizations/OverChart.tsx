@@ -27,7 +27,7 @@ const OverChart: React.FC<OverChartProps> = ({
     d3.select(svgRef.current).selectAll("*").remove();
     
     // Remove existing tooltips
-    d3.selectAll('.tooltip').remove();
+    // d3.selectAll('.tooltip').remove();
 
     const height = 280;
     const convertDimension = (d: number) => ((d * height) / 450);

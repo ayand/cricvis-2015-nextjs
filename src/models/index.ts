@@ -103,6 +103,16 @@ export interface GameInfo {
   second_batsmen: string[];
 }
 
+export interface OverSummary {
+  runs: number;
+  wickets: number;
+}
+
+export interface KeyedOverSummary {
+  [key: string]: number;
+  runs: number;
+  wickets: number;
+}
 
 export interface BattingInning {
   balls_faced: number;
