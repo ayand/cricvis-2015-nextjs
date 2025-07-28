@@ -105,38 +105,6 @@ const MatchHeader: React.FC<MatchHeaderProps> = ({
           </div>
         </div>
       </div>
-
-      {/* Team Flags */}
-      {/* <div className="flex justify-center space-x-8 mt-6">
-        <div className="text-center">
-          <Image
-            src={flags[team1] || '/flags/default.png'}
-            alt={`${team1} flag`}
-            width={50}
-            height={50}
-            className="border border-gray-300 rounded"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.src = '/flags/default.png';
-            }}
-          />
-          <p className="text-sm text-gray-600 mt-2">{team1}</p>
-        </div>
-        <div className="text-center">
-          <Image
-            src={flags[team2] || '/flags/default.png'}
-            alt={`${team2} flag`}
-            width={50}
-            height={50}
-            className="border border-gray-300 rounded"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.src = '/flags/default.png';
-            }}
-          />
-          <p className="text-sm text-gray-600 mt-2">{team2}</p>
-        </div>
-      </div> */}
     </div>
   );
 };

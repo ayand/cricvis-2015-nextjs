@@ -59,13 +59,6 @@ const MatchPageClient: React.FC<MatchPageClientProps> = ({
           onSeeAllBallsChange={handleSeeAllBalls}
         />
       </div>
-
-        {/* Inning Selection Display */}
-        {/* <div className="text-center mb-6">
-          <p className="text-lg font-medium text-gray-700">
-            Currently viewing: Inning {selectedInning}
-          </p>
-        </div> */}
         
         {/* Children Content */}
         {children && (

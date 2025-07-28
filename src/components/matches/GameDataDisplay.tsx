@@ -1,57 +1,16 @@
 'use client';
 
-import { BallData, OverSummary } from '@/models';
 import { useGameContext } from '../../contexts/GameContext';
-import OverChart from '../visualizations/OverChart';
 import VerticalColorLegend from '../visualizations/VerticalColorLegend';
 import Image from 'next/image';
-import OverSummaryChart from '../visualizations/OverSummaryChart';
 import InningsChartsDisplay from '../utilities/InningsChartsDisplay';
-
-const calculateOverSummaries = (balls: BallData[]): OverSummary[] => {
-    const maxOvers = Math.floor(balls[balls.length - 1].ovr) + 1;
-    const overSummaries: OverSummary[] = Array(maxOvers).fill(null).map(() => ({
-        runs: 0,
-        wickets: 0
-    }));
-
-    balls.forEach(ball => {
-        const over = Math.floor(ball.ovr);
-        const wicketAmount = (ball.wicket && ball.extras_type != "Nb" && ball.extras_type != "Wd") ? 1 : 0;
-        overSummaries[over].runs += ball.runs_batter;
-        overSummaries[over].wickets += wicketAmount;
-    });
-
-    return overSummaries;
-};
+import { calculateInningData } from '@/services/gameDataService';
 
 const GameDataDisplay: React.FC = () => {
     const { gameInfo, flags, seeAllBalls } = useGameContext();
 
-    // Calculate runs and wickets for each inning
-    const calculateInningStats = (inning: number) => {
-        const inningBalls = gameInfo.balls.filter(ball => ball.inning === inning);
-        const totalRuns = inningBalls[inningBalls.length - 1].cumul_runs;
-        const totalWickets = inningBalls.filter(ball => ball.wicket == true && ball.extras_type != "Nb" && ball.extras_type != "Wd").length;
-        return { totalRuns, totalWickets };
-    };
-
-    const firstInningStats = calculateInningStats(1);
-    const secondInningStats = calculateInningStats(2);
-
-    // Get team names from the first ball of each inning
-    const firstInningTeam = gameInfo.balls.find(ball => ball.inning === 1)?.batting_team || '';
-    const secondInningTeam = gameInfo.balls.find(ball => ball.inning === 2)?.batting_team || '';
-
-    // Filter balls for each inning
-    const firstInningBalls = gameInfo.balls.filter(ball => ball.inning === 1);
-    const secondInningBalls = gameInfo.balls.filter(ball => ball.inning === 2);
-
-    const firstDivision = calculateOverSummaries(firstInningBalls);
-    const secondDivision = calculateOverSummaries(secondInningBalls);
-
-    const firstBattingTeam = firstInningBalls[0].batting_team;
-    const secondBattingTeam = secondInningBalls[0].batting_team;
+    const { balls: firstInningBalls, stats: firstInningStats, battingTeam: firstBattingTeam, overSummaries: firstDivision } = calculateInningData(gameInfo, 1)!;
+    const { balls: secondInningBalls, stats: secondInningStats, battingTeam: secondBattingTeam, overSummaries: secondDivision } = calculateInningData(gameInfo, 2)!;
 
     return (
         <div className="bg-white rounded-lg shadow-lg p-6">
@@ -75,8 +34,8 @@ const GameDataDisplay: React.FC = () => {
                         <div className="text-center mb-4">
                             <div className="flex justify-center mb-3">
                                 <Image
-                                    src={flags[firstInningTeam] || '/flags/default.png'}
-                                    alt={`${firstInningTeam} flag`}
+                                    src={flags[firstBattingTeam] || '/flags/default.png'}
+                                    alt={`${firstBattingTeam} flag`}
                                     width={0}
                                     height={0}
                                     sizes="100vw"
@@ -88,7 +47,7 @@ const GameDataDisplay: React.FC = () => {
                                 />
                             </div>
                             <h3 className="text-lg font-semibold text-gray-800 mb-1">
-                                1st Innings: {firstInningTeam}
+                                1st Innings: {firstBattingTeam}
                             </h3>
                             <p className="text-xl font-bold text-gray-700">
                                 {firstInningStats.totalRuns}-{firstInningStats.totalWickets}
@@ -110,8 +69,8 @@ const GameDataDisplay: React.FC = () => {
                         <div className="text-center mb-4">
                             <div className="flex justify-center mb-3">
                                 <Image
-                                    src={flags[secondInningTeam] || '/flags/default.png'}
-                                    alt={`${secondInningTeam} flag`}
+                                    src={flags[secondBattingTeam] || '/flags/default.png'}
+                                    alt={`${secondBattingTeam} flag`}
                                     width={0}
                                     height={0}
                                     sizes="100vw"
@@ -123,7 +82,7 @@ const GameDataDisplay: React.FC = () => {
                                 />
                             </div>
                             <h3 className="text-lg font-semibold text-gray-800 mb-1">
-                                2nd Innings: {secondInningTeam}
+                                2nd Innings: {secondBattingTeam}
                             </h3>
                             <p className="text-xl font-bold text-gray-700">
                                 {secondInningStats.totalRuns}-{secondInningStats.totalWickets}
