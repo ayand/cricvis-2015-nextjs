@@ -15,7 +15,7 @@ export default function TournamentLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
+  // const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
@@ -94,7 +94,7 @@ export default function TournamentLayout({
   ];
 
   const handleTeamSelect = (team: Team) => {
-    setSelectedTeam(team.team);
+    // setSelectedTeam(team.team);
     setIsLoading(true);
     console.log('Selected team:', team.team);
     router.push(`/tournament/team/${team.key}`);

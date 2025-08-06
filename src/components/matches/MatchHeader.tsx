@@ -25,7 +25,7 @@ const MatchHeader: React.FC<MatchHeaderProps> = ({
   onSeeAllBallsChange
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [selectedInning, setSelectedInning] = useState<number>(1);
+  const [_selectedInning, setSelectedInning] = useState<number>(1);
 
   const handleInningSelect = (inning: number) => {
     setSelectedInning(inning);
@@ -49,31 +49,29 @@ const MatchHeader: React.FC<MatchHeaderProps> = ({
         {result}
       </h3>
       <h3 className="text-xl font-semibold text-gray-700 mb-4">Skyline of Overs</h3>
-      
+
       <div className="flex flex-col items-center space-y-4">
-      <div className="flex gap-2">
-              <button
-                className={`px-4 py-2 rounded font-medium transition-colors ${
-                  seeAllBalls
-                    ? 'bg-green-500 text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
-                onClick={() => onSeeAllBallsChange()}
-              >
-                Ball-by-Ball Analysis
-              </button>
-              <button
-                className={`px-4 py-2 rounded font-medium transition-colors ${
-                  !seeAllBalls
-                    ? 'bg-green-500 text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
-                onClick={() => onSeeAllBallsChange()}
-              >
-                Over Summary
-              </button>
-            </div>
-        
+        <div className="flex gap-2">
+          <button
+            className={`px-4 py-2 rounded font-medium transition-colors ${seeAllBalls
+                ? 'bg-green-500 text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+            onClick={() => onSeeAllBallsChange()}
+          >
+            Ball-by-Ball Analysis
+          </button>
+          <button
+            className={`px-4 py-2 rounded font-medium transition-colors ${!seeAllBalls
+                ? 'bg-green-500 text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+            onClick={() => onSeeAllBallsChange()}
+          >
+            Over Summary
+          </button>
+        </div>
+
         <div className="dropdown">
           <div className="btn-group">
             <button

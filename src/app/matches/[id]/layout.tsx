@@ -41,6 +41,7 @@ export default async function MatchLayout({ params, children }: MatchLayoutProps
       date={date}
       ground={ground}
       result={result}
+      id={id}
     >
       {children}
     </MatchPageClient>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import MatchHeader from '../matches/MatchHeader';
 import { GameInfo, Partnership, PlayerInfo } from '@/models';
 import { GameProvider } from '../../contexts/GameContext';
@@ -16,6 +17,7 @@ interface MatchPageClientProps {
   date: string;
   ground: string;
   result: string;
+  id: string;
   children?: React.ReactNode;
 }
 
@@ -30,14 +32,16 @@ const MatchPageClient: React.FC<MatchPageClientProps> = ({
   date,
   ground,
   result,
+  id,
   children
 }) => {
   const [selectedInning, setSelectedInning] = useState<number>(0);
   const [seeAllBalls, setSeeAllBalls] = useState<boolean>(true);
+  const router = useRouter();
 
   const handleInningChange = (inning: number) => {
     setSelectedInning(inning);
-    console.log('Selected inning:', inning);
+    router.push(`/matches/${id}/innings/${inning}`);
   };
 
   const handleSeeAllBalls = () => {
