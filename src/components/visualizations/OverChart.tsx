@@ -143,48 +143,19 @@ const OverChart: React.FC<OverChartProps> = ({
     svg.selectAll(".tick text").style("fill", "black").style("font-weight", "bold");
 
     // Initial visibility
-    const changeVisibility = (newMin: number, newMax: number) => {
+    const updateVisibility = (currentMin: number, currentMax: number) => {
       d3.selectAll("." + className)
-        .classed("visiblebar", function(d: any) {
+        .style("opacity", function(d: any) {
           const over = Math.ceil(d.ovr);
-          return (over >= newMin && over <= newMax);
-        })
-        .classed("invisiblebar", function(d: any) {
-          const over = Math.ceil(d.ovr);
-          return !(over >= newMin && over <= newMax);
+          if (over >= currentMin && over <= currentMax) {
+            return 1;
+          } else {
+            return 0.2;
+          }
         });
     };
 
-    changeVisibility(min, max);
 
-    // Initial hover functionality
-    if (hoverswitch) {
-      d3.selectAll('.' + className)
-        .on("mouseover", function(event: any, d: any) {
-          const over = Math.ceil(d.ovr);
-          if (over >= min && over <= max) {
-            d3.selectAll('.visiblebar')
-              .style("opacity", function(ball: any) {
-                if (d === ball) {
-                  return 1;
-                } else {
-                  return 0.2;
-                }
-              });
-
-            tooltip
-              .style('opacity', 1)
-              .html(tooltipText(d))
-              .style('left', (event.pageX + 10) + 'px')
-              .style('top', (event.pageY - 10) + 'px');
-          }
-        })
-        .on("mouseout", function() {
-          d3.selectAll('.visiblebar')
-            .style("opacity", 1);
-          tooltip.style('opacity', 0);
-        });
-    }
 
   }, []); // Empty dependency array - only runs once on mount
 
@@ -195,52 +166,84 @@ const OverChart: React.FC<OverChartProps> = ({
     const className = (val[0]?.inning === 1) ? "ballBar1" : "ballBar2";
 
     // Update visibility
-    const changeVisibility = (newMin: number, newMax: number) => {
+    const updateVisibility = (currentMin: number, currentMax: number) => {
       d3.selectAll("." + className)
-        .classed("visiblebar", function(d: any) {
+        .style("opacity", function(d: any) {
           const over = Math.ceil(d.ovr);
-          return (over >= newMin && over <= newMax);
-        })
-        .classed("invisiblebar", function(d: any) {
-          const over = Math.ceil(d.ovr);
-          return !(over >= newMin && over <= newMax);
+          if (over >= currentMin && over <= currentMax) {
+            return 1;
+          } else {
+            return 0.2;
+          }
         });
     };
 
-    changeVisibility(min, max);
+    // Update visibility
+    updateVisibility(min, max);
 
-    // Update hover functionality
+    // Remove existing event handlers
+    d3.selectAll('.' + className)
+      .on("mouseover", null)
+      .on("mouseout", null);
+
+    // Update hover functionality with current min/max values
     if (hoverswitch) {
       d3.selectAll('.' + className)
         .on("mouseover", function(event: any, d: any) {
           const over = Math.ceil(d.ovr);
           if (over >= min && over <= max) {
-            d3.selectAll('.visiblebar')
+            d3.selectAll("." + className)
               .style("opacity", function(ball: any) {
+                const ballOver = Math.ceil(ball.ovr);
                 if (d === ball) {
-                  return 1;
+                  return 1; // Full opacity for hovered ball
+                } else if (ballOver >= min && ballOver <= max) {
+                  return 0.2; // Dimmed for other balls in range
                 } else {
-                  return 0.2;
+                  return 0.2; // Dimmed for balls outside range
                 }
               });
 
             const tooltip = d3.select('.tooltip');
+            const tooltipText = (d: BallData) => {
+              const overNumber = Math.ceil(d.ovr);
+              const ballNumber = Math.round((d.ovr * 10) % 10);
+              const batsman = d.batsman_name;
+              const bowler = d.bowler_name;
+              const runs = d.runs_w_extras;
+              const scoreType = d.extras_type;
+              
+              let score = "";
+              if (scoreType === "Wd") {
+                score = "Wides";
+              } else if (scoreType === "Lb") {
+                score = "Leg byes";
+              } else if (scoreType === "Nb") {
+                score = "No Ball";
+              } else {
+                score = "Runs";
+              }
+
+              const line1 = `<strong>Over ${overNumber}, Ball ${ballNumber}</strong><br/>`;
+              const line2 = `${batsman}: ${runs} ${score}<br/>`;
+              const line3 = `Bowled by ${bowler}<br/>`;
+              const line4 = !isWicketBall(d) ? "" : `Wicket- ${d.who_out} (${d.wicket_method})`;
+              
+              return line1 + line2 + line3 + line4;
+            };
+            
             tooltip
               .style('opacity', 1)
-              .html(`<strong>Over ${Math.ceil(d.ovr)}, Ball ${Math.round((d.ovr * 10) % 10)}</strong><br/>${d.batsman_name}: ${d.runs_w_extras} ${d.extras_type || 'Runs'}<br/>Bowled by ${d.bowler_name}`)
+              .html(tooltipText(d))
               .style('left', (event.pageX + 10) + 'px')
               .style('top', (event.pageY - 10) + 'px');
           }
         })
         .on("mouseout", function() {
-          d3.selectAll('.visiblebar')
-            .style("opacity", 1);
+          // Restore the filtered state when mouse leaves any ball
+          updateVisibility(min, max);
           d3.select('.tooltip').style('opacity', 0);
         });
-    } else {
-      d3.selectAll('.' + className)
-        .on("mouseover", null)
-        .on("mouseout", null);
     }
 
   }, [min, max, hoverswitch]); // Only depend on min, max, and hoverswitch

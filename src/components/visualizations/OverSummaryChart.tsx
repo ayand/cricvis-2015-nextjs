@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import { KeyedOverSummary } from '@/models';
+import { teamColors } from '@/lib/teamColors';
 
 interface OverSummaryChartProps {
   val: KeyedOverSummary[];
@@ -70,28 +71,6 @@ const OverSummaryChart: React.FC<OverSummaryChartProps> = ({
     const overs = d3.scaleBand().range([margin, (width - margin)]);
     overs.domain(overNumbers);
 
-    const teamColors: Record<string, string> = {};
-    teamColors["India"] = "#0080FF";
-    teamColors["Bangladesh"] = "#5AAB54";
-    teamColors["United Arab Emirates"] = "#003366";
-    teamColors["Scotland"] = "#66B2FF";
-    teamColors["Ireland"] = "#80FF00";
-    teamColors["Afghanistan"] = "#0066CC";
-    teamColors["England"] = "#004C99";
-    teamColors["South Africa"] = "#006633";
-    teamColors["Australia"] = "gold";
-    teamColors["New Zealand"] = "#000000";
-    teamColors["West Indies"] = "#660000";
-    teamColors["Pakistan"] = "#00CC00";
-    teamColors["Zimbabwe"] = "#CC0000";
-    teamColors["Sri Lanka"] = "#000099";
-
-    const tooltipText = (d: KeyedOverSummary, overNumber: number) => {
-      const runsScored = (d.runs == 0) ? "" : (`Runs Scored: ${d.runs}<br/>`);
-      const wicketsTaken = (d.wickets == 0) ? "" : (`Wickets Taken: ${d.wickets}`);
-      return `Over ${overNumber}<br/>${runsScored}${wicketsTaken}`;
-    };
-
     const stack = d3.stack()
       .keys(["runs", "wickets"])
       .order(d3.stackOrderNone)
@@ -122,53 +101,7 @@ const OverSummaryChart: React.FC<OverSummaryChartProps> = ({
       .attr("height", function(d: any) {
         return (convertDimension(12) * (d[1] - d[0]));
       })
-      .attr("width", overs.bandwidth())
-      .on("mouseover", function(event: any, d: any) {
-        const overIndex = (d3.select(this).datum() as any).data.key as number;
-        const over = overIndex + 1;
-        console.log(over)
-        if (over >= min && over <= max) {
-          // Highlight the hovered bar
-          vis.selectAll('.summary-bar')
-            .selectAll('rect')
-            .style("opacity", function(bar: any, j: number) {
-              if (overIndex == j) {
-                return 1;
-              } else {
-                return 0.2;
-              }
-            });
-          
-          // Show tooltip
-          tooltip
-            .style('opacity', 1)
-            .html(tooltipText(d.data, over))
-            .style('left', (event.pageX + 10) + 'px')
-            .style('top', (event.pageY - 10) + 'px');
-        }
-      })
-      .on("mousemove", function(event: any) {
-        // Update tooltip position on mouse move
-        tooltip
-          .style('left', (event.pageX + 10) + 'px')
-          .style('top', (event.pageY - 10) + 'px');
-      })
-      .on("mouseout", function() {
-        // Reset opacity for all bars
-        vis.selectAll('.summary-bar')
-          .selectAll('rect')
-          .style("opacity", function(d: any, i: number) {
-            const over = i + 1;
-            if (over >= min && over <= max) {
-              return 1;
-            } else {
-              return 0.2;
-            }
-          });
-        
-        // Hide tooltip
-        tooltip.style('opacity', 0);
-      });
+      .attr("width", overs.bandwidth());
 
     const overAxis = d3.axisBottom(overs);
     overAxis.tickValues(['5', '10', '15', '20', '25', '30', '35', '40', '45', '50']);
@@ -183,22 +116,6 @@ const OverSummaryChart: React.FC<OverSummaryChartProps> = ({
     vis.selectAll(".domain").attr("stroke", "black");
     vis.selectAll(".tick text").style("fill", "black").style("font-weight", "bold");
 
-    // Initial visibility
-    const changeVisibility = (newMin: number, newMax: number) => {
-      vis.selectAll('.summary-bar')
-        .selectAll('rect')
-        .style("opacity", function(d: any, i: number) {
-          const over = i + 1;
-          if (over >= newMin && over <= newMax) {
-            return 1;
-          } else {
-            return 0.2;
-          }
-        });
-    };
-
-    changeVisibility(min, max);
-
     // Cleanup function to remove tooltip when component unmounts
     return () => {
       d3.selectAll('.tooltip').remove();
@@ -206,17 +123,19 @@ const OverSummaryChart: React.FC<OverSummaryChartProps> = ({
 
   }, []); // Empty dependency array - only runs once on mount
 
-  // Separate useEffect for min and max changes
+  // Separate useEffect for min and max changes and event handling
   useEffect(() => {
     if (!svgRef.current) return;
 
-    const changeVisibility = (newMin: number, newMax: number) => {
-      d3.select(svgRef.current)
-        .selectAll('.summary-bar')
+    const vis = d3.select(svgRef.current);
+    
+    // Function to update visibility based on current min/max
+    const updateVisibility = (currentMin: number, currentMax: number) => {
+      vis.selectAll('.summary-bar')
         .selectAll('rect')
         .style("opacity", function(d: any, i: number) {
           const over = i + 1;
-          if (over >= newMin && over <= newMax) {
+          if (over >= currentMin && over <= currentMax) {
             return 1;
           } else {
             return 0.2;
@@ -224,7 +143,82 @@ const OverSummaryChart: React.FC<OverSummaryChartProps> = ({
         });
     };
 
-    changeVisibility(min, max);
+    // Update cursor styles
+    vis.selectAll('.summary-bar')
+      .selectAll('rect')
+      .style("cursor", function(d: any, i: number) {
+        const over = i + 1;
+        return (over >= min && over <= max) ? "pointer" : "default";
+      });
+
+    // Remove existing event handlers
+    vis.selectAll('.summary-bar')
+      .selectAll('rect')
+      .on("mouseover", null)
+      .on("mousemove", null)
+      .on("mouseout", null);
+
+    // Add new event handlers with current min/max values
+    vis.selectAll('.summary-bar')
+      .selectAll('rect')
+      .on("mouseover", function(event: any, d: any) {
+        const overIndex = (d3.select(this).datum() as any).data.key as number;
+        const over = overIndex + 1;
+        
+        // Only proceed if the bar is within the current range
+        if (over >= min && over <= max) {
+          // Highlight the hovered bar
+          vis.selectAll('.summary-bar')
+            .selectAll('rect')
+            .style("opacity", function(bar: any, j: number) {
+              const barOver = j + 1;
+              if (overIndex == j) {
+                return 1; // Full opacity for hovered bar
+              } else if (barOver >= min && barOver <= max) {
+                return 0.2; // Dimmed for other bars in range
+              } else {
+                return 0.2; // Dimmed for bars outside range
+              }
+            });
+          
+          // Show tooltip
+          const tooltip = d3.select('.stacked-bar-tooltip');
+          const tooltipText = (d: KeyedOverSummary, overNumber: number) => {
+            const runsScored = (d.runs == 0) ? "" : (`Runs Scored: ${d.runs}<br/>`);
+            const wicketsTaken = (d.wickets == 0) ? "" : (`Wickets Taken: ${d.wickets}`);
+            return `Over ${overNumber}<br/>${runsScored}${wicketsTaken}`;
+          };
+          
+          tooltip
+            .style('opacity', 1)
+            .html(tooltipText(d.data, over))
+            .style('left', (event.pageX + 10) + 'px')
+            .style('top', (event.pageY - 10) + 'px');
+        }
+      })
+      .on("mousemove", function(event: any) {
+        const overIndex = (d3.select(this).datum() as any).data.key as number;
+        const over = overIndex + 1;
+        
+        // Only update tooltip position if the bar is within the current range
+        if (over >= min && over <= max) {
+          const tooltip = d3.select('.stacked-bar-tooltip');
+          tooltip
+            .style('left', (event.pageX + 10) + 'px')
+            .style('top', (event.pageY - 10) + 'px');
+        }
+      })
+      .on("mouseout", function() {
+        // Always restore the filtered state when mouse leaves any bar
+        updateVisibility(min, max);
+        
+        // Hide tooltip
+        const tooltip = d3.select('.stacked-bar-tooltip');
+        tooltip.style('opacity', 0);
+      });
+
+    // Update initial visibility
+    updateVisibility(min, max);
 
   }, [min, max]); // Only depends on min and max
 

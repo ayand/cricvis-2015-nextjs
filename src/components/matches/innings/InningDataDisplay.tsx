@@ -5,9 +5,10 @@ import { useGameContext } from '../../../contexts/GameContext';
 import VerticalColorLegend from '../../visualizations/VerticalColorLegend';
 import InningsChartsDisplay from '@/components/utilities/InningsChartsDisplay';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import OverTimeline from '@/components/visualizations/OverTimeline';
 import InningStatisticsDisplays from './InningStatisticsDisplays';
+import { DualRangeSlider } from '@/components/ui/dual-range-slider';
 
 interface InningsDataDisplayProps {
     inning: number;
@@ -17,9 +18,29 @@ export default function InningsDataDisplay({ inning }: InningsDataDisplayProps) 
     const { gameInfo, flags, seeAllBalls } = useGameContext();
 
     const [chartView, setChartView] = useState<string>('Timeline');
-    const chartViews = ['Timeline', 'Partner Matrix', 'Partner Bars']
+    const chartViews = ['Timeline', 'Partner Matrix', 'Partner Bars'];
+    
+    // Add min and max state variables
+    const [min, setMin] = useState<number>(1);
+    const [max, setMax] = useState<number>(50);
 
     const { balls: inningBalls, stats: inningStats, battingTeam: inningBattingTeam, overSummaries: inningDivision } = calculateInningData(gameInfo, inning)!;
+
+    // Reset min and max when inning changes (new page load)
+    useEffect(() => {
+        setMin(1);
+        setMax(50);
+    }, [inning]);
+
+    // Calculate slider width to match SVG width (same as OverChart/OverSummaryChart)
+    const height = 280;
+    const convertDimension = (d: number) => ((d * height) / 450);
+    const sliderWidth = convertDimension(720);
+
+    const handleSliderChange = (value: number[]) => {
+        setMin(value[0]);
+        setMax(value[1]);
+    };
 
     return (
         <div className="bg-white rounded-lg shadow-lg p-6">
@@ -66,19 +87,36 @@ export default function InningsDataDisplay({ inning }: InningsDataDisplayProps) 
                                 </div>
                                 <InningsChartsDisplay
                                     ballData={inningBalls}
-                                    min={1}
-                                    max={50}
+                                    min={min}
+                                    max={max}
                                     hoverswitch={true}
                                     overSummaries={inningDivision.map((ball, i) => ({ 'key': i, ...ball }))}
                                     team={inningBattingTeam}
                                     seeAllBalls={seeAllBalls}
                                 />
+                                <div className="mt-4 flex justify-center">
+                                    <div style={{ width: `${sliderWidth}px` }}>
+                                        <div className="text-center mt-1">
+                                            <span className="text-md text-gray-500">Overs</span>
+                                        </div>
+                                        <br/>
+                                        <DualRangeSlider
+                                            min={1}
+                                            max={50}
+                                            value={[min, max]}
+                                            onValueChange={handleSliderChange}
+                                            className="w-full"
+                                            label={(value) => value?.toString() || ''}
+                                            labelPosition="bottom"
+                                        />
+                                    </div>
+                                </div>
                             </div>
-                            <InningStatisticsDisplays inning={inning} allBalls={gameInfo.balls} inningBalls={inningBalls} min={1} max={50} />
+                            <InningStatisticsDisplays inning={inning} allBalls={gameInfo.balls} inningBalls={inningBalls} min={min} max={max} />
                         </>
                     ) : (
                         <>
-                            <InningStatisticsDisplays inning={inning} allBalls={gameInfo.balls} inningBalls={inningBalls} min={1} max={50} />
+                            <InningStatisticsDisplays inning={inning} allBalls={gameInfo.balls} inningBalls={inningBalls} min={min} max={max} />
                             <div className="bg-gray-50 rounded-lg p-6">
                                 <div className="text-center mb-4">
                                     <div className="flex justify-center mb-3">
@@ -104,13 +142,30 @@ export default function InningsDataDisplay({ inning }: InningsDataDisplayProps) 
                                 </div>
                                 <InningsChartsDisplay
                                     ballData={inningBalls}
-                                    min={1}
-                                    max={50}
+                                    min={min}
+                                    max={max}
                                     hoverswitch={true}
                                     overSummaries={inningDivision.map((ball, i) => ({ 'key': i, ...ball }))}
                                     team={inningBattingTeam}
                                     seeAllBalls={seeAllBalls}
                                 />
+                                <div className="mt-4 flex justify-center">
+                                    <div style={{ width: `${sliderWidth}px` }}>
+                                        <div className="text-center mt-1">
+                                            <span className="text-md text-gray-500">Overs</span>
+                                        </div>
+                                        <br/>
+                                        <DualRangeSlider
+                                            min={1}
+                                            max={50}
+                                            value={[min, max]}
+                                            onValueChange={handleSliderChange}
+                                            className="w-full"
+                                            label={(value) => value?.toString() || ''}
+                                            labelPosition="bottom"
+                                        />
+                                    </div>
+                                </div>
                             </div>
                         </>
                     )}
